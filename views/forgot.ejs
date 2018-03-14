@@ -1,0 +1,16 @@
+<% include ./partials/header %>
+<h1 style="text-align:center; margin:25px auto;">Forgot Password!</h1>
+<div style="width:30%; margin:25px auto;">
+    <form action="/forgot" method="POST">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input class="form-control" type="email" name="email" placeholder="your@mail.com" autofocus>
+        </div>
+        
+        <div class="form-group">
+            <button class="btn btn-primary btn-lg btn-block">Reset Password</button>
+        </div>
+        
+    </form>
+</div>
+<% include ./partials/footer %>
