@@ -129,7 +129,7 @@ router.put("/:id", middleware.checkCampgroundOwnership, function(req, res){
     var lat = data[0].latitude;
     var lng = data[0].longitude;
     var location = data[0].formattedAddress;
-    var newData = {name: req.body.name, image: req.body.image, description: req.body.description, location: location, lat: lat, lng: lng};
+    var newData = {name: req.body.campground.name, image: req.body.campground.image, description: req.body.campground.description, location: location, lat: lat, lng: lng};
     Campground.findByIdAndUpdate(req.params.id, newData, function(err, campground){
         if(err){
             req.flash("error", err.message);
