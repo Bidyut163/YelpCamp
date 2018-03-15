@@ -14,16 +14,37 @@ var options = {
  
 var geocoder = NodeGeocoder(options);
 
+
+function escapeRegex(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
+
 //INDEX - show all campgrounds
 router.get("/", function(req, res){
-    // Get all campgrounds from DB
-    Campground.find({}, function(err, allCampgrounds){
-       if(err){
-           console.log(err);
-       } else {
-          res.render("campgrounds/index",{campgrounds:allCampgrounds});
-       }
-    });
+    var noMatch;
+    if(req.query.search){
+        const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+        Campground.find({name:regex}, function(err, allCampgrounds){
+           if(err){
+               console.log(err);
+           } else {
+               
+               if(allCampgrounds.length < 1){
+                   noMatch = "No Campgrounds Found with this search, try different search!";
+               }
+              res.render("campgrounds/index",{campgrounds:allCampgrounds, noMatch:noMatch});
+           }
+        });
+    } else{
+        // Get all campgrounds from DB
+        Campground.find({}, function(err, allCampgrounds){
+           if(err){
+               console.log(err);
+           } else {
+              res.render("campgrounds/index",{campgrounds:allCampgrounds, noMatch:noMatch});
+           }
+        });
+    }
 });
 
 //CREATE - add new campground to DB
@@ -152,7 +173,6 @@ router.delete("/:id",middleware.checkCampgroundOwnership, function(req, res){
       }
    });
 });
-
 
 module.exports = router;
 
