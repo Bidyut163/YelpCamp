@@ -1,66 +1,68 @@
-var express     = require("express");
-var router      = express.Router();
-var passport    = require("passport");
-var User        = require("../models/user");
+var express = require("express");
+var router = express.Router();
+var passport = require("passport");
+var User = require("../models/user");
 // var async       = require("async");
 // var nodemailer  = require("nodemailer");
 // var crypto      = require("crypto");
 
 //root route
-router.get("/", function(req, res){
-    res.render("landing");
+router.get("/", function(req, res) {
+  res.render("landing");
 });
 
 // show register form
-router.get("/register", function(req, res){
-   res.render("register"); 
+router.get("/register", function(req, res) {
+  res.render("register");
 });
 
 //handle sign up logic
 
 router.post("/register", function(req, res) {
-    var newUser= new User({
-            username:req.body.username,
-            firstName:req.body.firstName,
-            lastName:req.body.lastName,
-            email:req.body.email,
-            avatar:req.body.avatar
-        });
-    if(req.body.adminCode === "secretCode@123"){
-        newUser.isAdmin = true;
+  var newUser = new User({
+    username: req.body.username,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email,
+    avatar: req.body.avatar
+  });
+  if (req.body.adminCode === process.env.secretAdminCode) {
+    newUser.isAdmin = true;
+  }
+  User.register(newUser, req.body.password, function(err, user) {
+    if (err) {
+      console.log(err);
+      req.flash("error", err.message);
+      return res.redirect("/register");
     }
-    User.register(newUser, req.body.password, function(err, user){
-        if(err){
-            console.log(err);
-            req.flash("error", err.message);
-            return res.redirect("/register");
-        } 
-        passport.authenticate("local")(req, res, function(){
-            req.flash("success", "Welcome to YelpCamp " + user.username);
-            res.redirect("/campgrounds");
-        });
+    passport.authenticate("local")(req, res, function() {
+      req.flash("success", "Welcome to YelpCamp " + user.username);
+      res.redirect("/campgrounds");
     });
+  });
 });
 
 //show login form
-router.get("/login", function(req, res){
-   res.render("login"); 
+router.get("/login", function(req, res) {
+  res.render("login");
 });
 
 //handling login logic
-router.post("/login", passport.authenticate("local", 
-    {
-        successRedirect: "/campgrounds",
-        failureRedirect: "/login",
-        failureFlash: true
-    }), function(req, res){
-});
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: "/campgrounds",
+    failureRedirect: "/login",
+    failureFlash: true
+  }),
+  function(req, res) {}
+);
 
 // logout route
-router.get("/logout", function(req, res){
-   req.logout();
-   req.flash("success", "Logged you out!");
-   res.redirect("/campgrounds");
+router.get("/logout", function(req, res) {
+  req.logout();
+  req.flash("success", "Logged you out!");
+  res.redirect("/campgrounds");
 });
 
 // forgot password
@@ -93,7 +95,7 @@ router.get("/logout", function(req, res){
 //     },
 //     function(token, user, done) {
 //       var smtpTransport = nodemailer.createTransport({
-//         service: 'Gmail', 
+//         service: 'Gmail',
 //         auth: {
 //           user: 'bidyutranjan464@gmail.com',
 //           pass: process.env.GMAILPW
@@ -157,7 +159,7 @@ router.get("/logout", function(req, res){
 //     },
 //     function(user, done) {
 //       var smtpTransport = nodemailer.createTransport({
-//         service: 'Gmail', 
+//         service: 'Gmail',
 //         auth: {
 //           user: 'bidyutranjan464@gmail.com',
 //           pass: process.env.GMAILPW
@@ -181,7 +183,7 @@ router.get("/logout", function(req, res){
 //       } else{
 //          res.redirect('/campgrounds');
 //       }
-    
+
 //   });
 // });
 
